@@ -82,7 +82,7 @@ module.exports = function getPlugin(S) {
           if (Array.isArray(webpackConfig.entry)) {
             webpackConfig.entry.push(handlerEntryPath);
           } else {
-            webpackConfig.entry = handlerEntryPath;
+            webpackConfig.entry = [handlerEntryPath];
           }
           webpackConfig.output = {
             libraryTarget: 'commonjs',
