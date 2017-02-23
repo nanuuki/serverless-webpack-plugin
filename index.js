@@ -8,7 +8,6 @@ const getConfig = require('./lib/getConfig');
 const getExternalsFromStats = require('./lib/getExternalsFromStats');
 const copyModules = require('./lib/copyModules');
 
-
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
     webpack(config).run((err, stats) => {
@@ -28,8 +27,8 @@ module.exports = function getPlugin(S) {
       colors: true,
       hash: false,
       version: false,
-      chunks: false,
-      children: false
+      chunks: true,
+      children: true
     }));
   }
 
@@ -99,7 +98,12 @@ module.exports = function getPlugin(S) {
             .then((stats) => {
               logStats(stats);
               const externals = getExternalsFromStats(stats);
-              return copyModules(projectPath, externals, optimizedModulesPath);
+
+              if (externals.length > 0) {
+                SCli.log('Injecting externals: ' + externals.join(', '));
+                return copyModules(projectPath, externals, optimizedModulesPath, SCli);
+              }
+              return Promise.resolve();
             })
             .then(() => {
               evt.options.pathDist = optimizedPath; // eslint-disable-line
