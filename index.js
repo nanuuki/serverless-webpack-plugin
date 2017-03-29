@@ -71,6 +71,7 @@ module.exports = function getPlugin(S) {
           const pathDist = evt.options.pathDist;
           const optimizedPath = path.join(pathDist, 'optimized');
           const optimizedModulesPath = path.join(optimizedPath, 'node_modules');
+          const funcPath = path.dirname(func.getFilePath());
 
           const webpackConfig = Object.assign({}, config.webpackConfig);
           const handlerName = func.getHandler().split('.')[0];
@@ -78,7 +79,7 @@ module.exports = function getPlugin(S) {
           const handlerEntryPath = `./${handlerFileName}`;
 
           // override entry and output
-          webpackConfig.context = path.dirname(func.getFilePath());
+          webpackConfig.context = funcPath;
           if (Array.isArray(webpackConfig.entry)) {
             webpackConfig.entry.push(handlerEntryPath);
           } else {
@@ -99,7 +100,7 @@ module.exports = function getPlugin(S) {
             .then((stats) => {
               logStats(stats);
               const externals = getExternalsFromStats(stats);
-              return copyModules(projectPath, externals, optimizedModulesPath);
+              return copyModules(funcPath, externals, optimizedModulesPath);
             })
             .then(() => {
               evt.options.pathDist = optimizedPath; // eslint-disable-line
